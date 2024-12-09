@@ -54,7 +54,8 @@ class OrderItem(db.Model):
             'color': self.color,
             'price': self.price,
             'design_config': self.design_config,
-            'created_at': self.created_at.isoformat()
+            'created_at': self.created_at.isoformat(),
+            'design': self.design.to_dict() if self.design else None  # design情報を追加
         }
 
 class CartItem(db.Model):

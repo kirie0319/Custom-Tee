@@ -192,3 +192,26 @@ def manage_user():
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+        
+@bp.route('/orders/<int:order_id>', methods=['GET'])
+@admin_required()
+def get_order_details(order_id):
+    try:
+        order = Order.query.get_or_404(order_id)
+        
+        # Orderモデルのto_dict()メソッドを使用して詳細情報を取得
+        order_data = order.to_dict()
+        
+        # ユーザー情報を追加
+        order_data['user'] = {
+            'id': order.user_id,
+            'email': order.customer.email if order.customer else None
+        }
+        
+        return jsonify(order_data), 200
+
+    except Exception as e:
+        import traceback
+        print("Error in get_order_details:", str(e))
+        print("Traceback:", traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
