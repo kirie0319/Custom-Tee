@@ -7,7 +7,20 @@ import requests
 load_dotenv()  # .envファイルから環境変数を読み込み
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)
+# より詳細なCORS設定
+cors_config = {
+    "origins": [
+        "http://localhost:5173",  # 開発環境のフロントエンド
+        "http://your-frontend-domain.com"  # 本番環境のフロントエンド
+    ],
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "allow_headers": ["Content-Type", "Authorization"]
+}
+CORS(app, resources={r"/api/*": cors_config})
+
+# 環境変数からポート設定を取得
+port = int(os.environ.get("PORT", 5000))
 
 @app.route('/')
 def hello():
@@ -44,5 +57,7 @@ def generate_design():
     image_url = result["output"][0] if "output" in result else "Error generating image"
     return jsonify({"message": f"Design generated for theme: {theme}", "image_url": image_url})
 
+# if __name__ == '__main__':
+#     app.run(debug=True)
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=port, debug=True)
