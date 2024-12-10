@@ -1,3 +1,4 @@
+# backend/app.py
 import os
 from flask import Flask, jsonify, request
 from flask_cors import CORS
@@ -12,7 +13,8 @@ app = Flask(__name__)
 cors_config = {
     "origins": [
         "http://localhost:5173",  # 開発環境のフロントエンド
-        "http://your-frontend-domain.com"  # 本番環境のフロントエンド
+        "http://your-frontend-domain.com",  # 本番環境のフロントエンド
+        "http://43.207.168.95:5000"
     ],
     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     "allow_headers": ["Content-Type", "Authorization"]
@@ -58,6 +60,6 @@ def generate_design():
     return jsonify({"message": f"Design generated for theme: {theme}", "image_url": image_url})
 
 # if __name__ == '__main__':
-#     app.run(debug=True)
+# app.py に以下の変更を加える
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(host='0.0.0.0', port=port, ssl_context='adhoc')
