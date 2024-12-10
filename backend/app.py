@@ -26,7 +26,7 @@ port = int(os.environ.get("PORT", 5000))
 
 @app.route('/')
 def hello():
-    return "Hello, CjjjustomAI Tee!"
+    return "Hello, CustomAI Tee!"
 
 @app.route('/api/message')
 def get_message():
@@ -60,6 +60,6 @@ def generate_design():
     return jsonify({"message": f"Design generated for theme: {theme}", "image_url": image_url})
 
 # if __name__ == '__main__':
-# app.py に以下の変更を加える
+#     app.run(debug=True)
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=port, ssl_context='adhoc')
+    app.run(host='0.0.0.0', port=port, debug=True)
