@@ -26,7 +26,7 @@ port = int(os.environ.get("PORT", 5000))
 
 @app.route('/')
 def hello():
-    return "Hello, CustomAI Tee!"
+    return "Hello, CjjjustomAI Tee!"
 
 @app.route('/api/message')
 def get_message():
