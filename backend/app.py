@@ -6,20 +6,35 @@ from dotenv import load_dotenv
 import requests
 
 load_dotenv()  # .envファイルから環境変数を読み込み
-
 app = Flask(__name__)
-CORS(app)
-# より詳細なCORS設定
 # cors_config = {
 #     "origins": [
-#         "http://localhost:5173",  # 開発環境のフロントエンド
-#         "http://your-frontend-domain.com",  # 本番環境のフロントエンド
-#         "http://43.207.168.95:5000"
+#         "http://localhost:3000",    # ローカル開発環境（.envのFRONTEND_URL）
+#         "http://localhost:5173",    # Viteのデフォルトポート
+#         "https://custome-tee-frontend-q7m6.vercel.app",  # Vercelの本番環境
 #     ],
 #     "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-#     "allow_headers": ["Content-Type", "Authorization"]
+#     "allow_headers": ["Content-Type", "Authorization", "Accept"],
+#     "supports_credentials": True,
+#     "expose_headers": ["Content-Type", "Authorization"],
+#     "send_wildcard": False,  # 重要: credentialsを使用する場合はFalseに
+#     "vary_header": True
 # }
-# CORS(app, resources={r"/api/*": cors_config})
+
+# CORS設定
+CORS(app, resources={
+    r"/api/*": {
+        "origins": [
+            "https://custome-tee-frontend-q7m6.vercel.app",  # 本番フロントエンドURL
+            "https://localhost:5173"           # ローカル環境用
+        ]
+    }
+}, supports_credentials=True)
+
+# CORS(app, resources={
+#     r"/api/*": cors_config,
+#     r"/auth/*": cors_config
+# })
 
 # 環境変数からポート設定を取得
 port = int(os.environ.get("PORT", 5000))
