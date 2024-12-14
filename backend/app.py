@@ -39,6 +39,34 @@ CORS(app, resources={
 # 環境変数からポート設定を取得
 port = int(os.environ.get("PORT", 5000))
 
+@bp.route('/login', methods=['POST'])
+def login():
+    try:
+        data = request.get_json()
+
+        # 必要なフィールドの確認
+        if not data.get('username') or not data.get('password'):
+            return jsonify({'error': 'Username and password are required'}), 400
+
+        # ユーザーの検索と認証
+        user = User.query.filter_by(username=data['username']).first()
+        if user and user.check_password(data['password']):
+            access_token = create_access_token(
+                identity=user.id,
+                additional_claims={'is_admin': user.is_admin},
+                expires_delta=timedelta(days=1)
+            )
+            return jsonify({
+                'access_token': access_token,
+                'user': user.to_dict()
+            }), 200
+
+        return jsonify({'error': 'Invalid username or password'}), 401
+
+    except Exception as e:
+        print(f"Login error: {str(e)}")  # デバッグ用
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/')
 def hello():
     return "Hello, CustomAI Tee!"

@@ -68,7 +68,4 @@ def create_app(config_class=Config):
         db.session.rollback()
         return jsonify({'error': 'Internal server error'}), 500
     
-    for rule in app.url_map.iter_rules():
-    print(f"Endpoint: {rule.endpoint}, URL: {rule.rule}")
-    
     return app
