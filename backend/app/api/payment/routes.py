@@ -20,7 +20,7 @@ def create_payment():
            return jsonify({'error': 'Cart is empty'}), 400
 
        # 合計金額を計算
-       total_amount = sum(item.quantity * 2000 for item in cart_items)
+       total_amount = sum(item.quantity * 3000 + 500 for item in cart_items)
 
        # Stripeの支払いインテントを作成
        payment_data = StripeService.create_payment_intent(total_amount)
