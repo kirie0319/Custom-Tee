@@ -1,5 +1,7 @@
 # app/api/designs/routes.py
 from flask import jsonify, request
+import requests
+import os
 from flask_jwt_extended import jwt_required, get_jwt_identity
 import uuid
 from app import db
@@ -9,6 +11,37 @@ from app.utils.stable_diffusion import StableDiffusionClient
 from app.utils.s3 import S3Client
 from app.api.designs import bp
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
+
+def translate_text(api_key, text, target_language):
+    """
+    Deepl APIを使用してテキストを翻訳する関数
+    
+    :param api_key: Deepl APIの認証キー
+    :param text: 翻訳するテキスト
+    :param target_language: 翻訳先の言語コード（例: "EN"）
+    :return: 翻訳結果のテキスト
+    """
+    url = 'https://api-free.deepl.com/v2/translate'
+
+    # リクエストのパラメータ
+    params = {
+        'auth_key': api_key,  # APIキー
+        'text': text,  # 翻訳するテキスト
+        'target_lang': target_language  # 翻訳先の言語
+    }
+
+    # リクエストを送信
+    response = requests.post(url, data=params)
+
+    # レスポンスの確認と翻訳結果の返却
+    if response.status_code == 200:
+        translated_text = response.json()['translations'][0]['text']
+        return translated_text
+    else:
+        return f"エラーが発生しました: {response.status_code}, {response.text}"
 
 @bp.route('/generate', methods=['POST'])
 @jwt_required()
@@ -18,6 +51,16 @@ def generate_design():
         data = request.get_json()
         if not data or not data.get('prompt'):
             return jsonify({'error': 'Prompt is required'}), 400
+
+        # 使用例
+        api_key = os.getenv('DEEPL_API_KEY')  # 自分のAPIキーに置き換えてください
+        text_to_translate = data['prompt']
+        target_language = "EN"  # 翻訳先の言語（例: "EN"）
+
+        translated_text = translate_text(api_key, text_to_translate, target_language)
+        print(f"翻訳前: {data['prompt']}")
+        print(f"翻訳結果: {translated_text}")
+        print(type(data['prompt']))
 
         current_user_id = get_jwt_identity()
         request_id = str(uuid.uuid4())
@@ -32,7 +75,7 @@ def generate_design():
 
         # Stable Diffusionで画像生成
         sd_client = StableDiffusionClient()
-        image_data = sd_client.generate_image(data['prompt'])
+        image_data = sd_client.generate_image(translated_text)
         
         # S3に画像をアップロード
         s3_client = S3Client()

@@ -10,4 +10,5 @@ instance/
 htmlcov/
 dist/
 build/
+test_google_translate.py
 *.egg-info/

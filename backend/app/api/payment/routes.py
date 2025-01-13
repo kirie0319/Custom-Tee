@@ -86,7 +86,7 @@ def confirm_payment():
                     quantity=cart_item.quantity,
                     size=cart_item.size,
                     color=cart_item.color,
-                    price=2000
+                    price=3000
                 )
                 db.session.add(order_item)
 
