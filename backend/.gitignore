@@ -11,4 +11,5 @@ htmlcov/
 dist/
 build/
 test_google_translate.py
+test_open.py
 *.egg-info/

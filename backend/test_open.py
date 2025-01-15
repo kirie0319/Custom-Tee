@@ -1,3 +1,29 @@
+import openai
+system_prompt = """
+        あなたはStable Diffusionのプロンプトエンジニアです。
+        以下の要件に従って、入力された日本語プロンプトを適切な英語のプロンプトに変換してください：
+        
+        1. アニメ調やキャラクター性を排除し、写実的・抽象的な表現に変換
+        2. 日本語特有のニュアンスや文化的文脈を保持
+        3. Stable Diffusionが解釈しやすい具体的な表現に変換
+        4. 必要に応じてスタイルやトーンの指定を追加
+        
+        出力形式：変換後の英語プロンプトのみを出力してください。説明は不要です。
+        """
+
+completion = openai.chat.completions.create(
+    model="gpt-4o",
+    messages=[
+        {"role": "developer", "content": system_prompt},
+        {
+            "role": "user",
+            "content": "夕暮れに黄昏る若者たち"
+        }
+    ]
+)
+
+print(completion.choices[0].message.content)
+
 # app/api/designs/routes.py
 from flask import jsonify, request
 import requests
@@ -62,11 +88,12 @@ def generate_design():
 
         print(f"翻訳前: {data['prompt']}")
         # 使用例
-        text_to_translate = data['prompt']
+        # api_key = os.getenv('OPEN_API_KEY')  # 自分のAPIキーに置き換えてください
+        # text_to_translate = data['prompt']
 
-        translated_text = translate_text(text_to_translate)
-        print(f"翻訳結果: {translated_text}")
-        print(type(data['prompt']))
+        # # translated_text = translate_text(text_to_translate)
+        # print(f"翻訳結果: {translated_text}")
+        # print(type(data['prompt']))
 
         current_user_id = get_jwt_identity()
         request_id = str(uuid.uuid4())
@@ -81,7 +108,7 @@ def generate_design():
 
         # Stable Diffusionで画像生成
         sd_client = StableDiffusionClient()
-        image_data = sd_client.generate_image(translated_text)
+        image_data = sd_client.generate_image(data['prompt'])
         
         # S3に画像をアップロード
         s3_client = S3Client()
